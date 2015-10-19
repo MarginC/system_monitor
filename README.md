@@ -21,7 +21,14 @@ make
 
 This will compile all dependencies and sources.
 
-To start the web server, run `./system_monitor`, that will start the server on port 3000.
+To install
+```
+make install
+```
+To handle a daemon web server, the following cmd can be used:
+- /etc/init.d/system_monitor start, that will start the server on port 3000.
+- /etc/init.d/system_monitor stop
+- /etc/init.d/system_monitor restart
 
 ## Todos
 - Make compilation easier and more portable (maybe use autoconf and automake)
@@ -31,7 +38,6 @@ To start the web server, run `./system_monitor`, that will start the server on p
   - Refresh timeout
   - What information to display
 - User auth
-- Run as daemon
 - Provide installers for common systems like debian
 - Process detailed information
 - Provide historic cpu, network and memory

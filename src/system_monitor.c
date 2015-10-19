@@ -2,7 +2,50 @@
 // System Monitor - multi-platform system monitor
 // See LICENSE
 
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <errno.h>
 #include "system_monitor.h"
+
+static int daemon (int nochdir, int noclose)
+{
+    pid_t pid;
+
+    pid = fork ();
+    /* In case of fork is error. */
+    if (pid < 0)
+        exit(-1);
+    /* In case of this is parent process. */
+    else if (pid != 0)
+        exit(0);
+
+    /* Become session leader and get pid. */
+    if (setsid() == -1)
+        exit(-1);
+
+    /* Change directory to root. */
+    if (! nochdir)
+        chdir ("/");
+
+    /* File descriptor close. */
+    if (! noclose)
+    {
+        int fd = open ("/dev/null", O_RDWR, 0);
+        if (fd != -1)
+        {
+            dup2 (fd, STDIN_FILENO);
+            dup2 (fd, STDOUT_FILENO);
+            dup2 (fd, STDERR_FILENO);
+            if (fd > 2)
+                close (fd);
+        }
+    }
+
+    umask (0027);
+
+    return 0;
+}
 
 sigar_t *sigar;
 struct global_options globalOptions;
@@ -36,15 +79,22 @@ void parse_arguments (int argc, char **argv)
     gmtime(&globalOptions.start_time);
 
     static struct option long_options[] = {
+        {"daemon", no_argument, 0, 'd'},
         {"port", required_argument, 0, 'p'},
         {0, 0, 0, 0}
     };
 
     while (1) {
-        opt = getopt_long(argc, argv, "p:", long_options, &index);
+        opt = getopt_long(argc, argv, "dp:", long_options, &index);
         if(opt == -1) break;
 
         switch (opt) {
+            case 'd':
+                if (daemon(0, 0)) {
+                    printf("daemon failed:%s\n", strerror(errno));
+                    exit(1);
+                }
+            break;
             case 'p':
                 strtol(optarg, &out, 10);
                 if (*out) {
@@ -54,6 +104,8 @@ void parse_arguments (int argc, char **argv)
                     globalOptions.port = optarg;
                 }
             break;
+            default:
+                exit(1);
         }
     }
 }

@@ -2,6 +2,8 @@ HEADERS = src/system_monitor.h src/web.h src/utils.h
 OBJECTS = src/main.o src/web.o src/system_monitor.o src/utils.o src/resources.o
 PROGRAM = system_monitor
 BINDIR = /usr/local/bin
+DEAMON = system_monitor.sh
+INITDIR = /etc/init.d
 
 JS_SOURCES = public/js/vendor/jquery.js \
 	public/js/vendor/jquery.dynatable.js \
@@ -89,6 +91,9 @@ clean:
 
 install: $(PROGRAM)
 	install -C $(PROGRAM) $(BINDIR)/$(PROGRAM)
+	install -C $(DEAMON) $(INITDIR)/$(PROGRAM)
+	chmod +x $(INITDIR)/$(PROGRAM)
 
 uninstall:
 	rm $(BINDIR)/$(PROGRAM)
+	rm $(INITDIR)/$(PROGRAM)
