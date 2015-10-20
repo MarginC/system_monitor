@@ -90,9 +90,8 @@ clean:
 	-rm src/resources.c
 
 install: $(PROGRAM)
-	install -C $(PROGRAM) $(BINDIR)/$(PROGRAM)
-	install -C $(DEAMON) $(INITDIR)/$(PROGRAM)
-	chmod +x $(INITDIR)/$(PROGRAM)
+	install -C -m 755 $(PROGRAM) $(BINDIR)/$(PROGRAM)
+	install -C -m 755 $(DEAMON) $(INITDIR)/$(PROGRAM)
 
 uninstall:
 	rm $(BINDIR)/$(PROGRAM)
